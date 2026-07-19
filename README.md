@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.png" width="180" alt="Netflix Watch History logo">
+</p>
+
 # Netflix Watch History
 
 Chrome extension that adds a **History** button to the Netflix navbar, taking you straight to the hidden viewing activity page.
