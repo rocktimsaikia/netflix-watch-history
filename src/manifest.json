@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Netflix Watch History",
+  "name": "Watch History for Netflix",
   "version": "1.0.0",
   "description": "Adds a History button to the Netflix navbar linking to your viewing activity.",
   "icons": {
