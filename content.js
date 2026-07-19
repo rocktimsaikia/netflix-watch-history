@@ -14,24 +14,25 @@ function inject() {
   // ponytail: /viewingactivity resolves to the active profile's history page
   a.setAttribute("href", "/viewingactivity");
   a.removeAttribute("aria-current");
+  // Monochrome SVG clock (emoji renders as a vivid glyph); follows text color.
+  const CLOCK_SVG =
+    '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:-1.5px;margin-right:5px"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
   clone
     .querySelectorAll('[data-uia="navigation-item-text"], span')
-    .forEach((s) => (s.textContent = "⏱ History"));
-  // Distinct pill look so it stands out from the stock nav tabs.
+    .forEach((s) => (s.innerHTML = CLOCK_SVG + "History"));
+  // Distinct filled pill so it stands out from the stock nav tabs.
   Object.assign(a.style, {
-    color: "#e50914",
-    border: "1px solid #e50914",
+    color: "#fff",
+    background: "#e50914",
     borderRadius: "999px",
     padding: "4px 12px",
     fontWeight: "700",
   });
   a.addEventListener("mouseenter", () => {
-    a.style.background = "#e50914";
-    a.style.color = "#fff";
+    a.style.background = "#b0060f";
   });
   a.addEventListener("mouseleave", () => {
-    a.style.background = "transparent";
-    a.style.color = "#e50914";
+    a.style.background = "#e50914";
   });
   // Netflix's SPA router ignores cloned React handlers; force a real navigation.
   a.addEventListener("click", (e) => {
@@ -145,7 +146,7 @@ function addThumbs() {
     // ponytail: search link, not direct title page — no free Netflix-to-IMDb
     // ID mapping; series episode rows search by show name alone
     const query = link.textContent.split(":")[0].trim();
-    imdb.href = `https://www.imdb.com/find/?q=${encodeURIComponent(query)}`;
+    imdb.href = `https://www.imdb.com/find/?s=tt&q=${encodeURIComponent(query)}`;
     titleCol.appendChild(imdb);
     thumbQueue.push({ id, img });
   });
