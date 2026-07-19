@@ -1,4 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <!-- off-white halo so black linework survives dark backgrounds -->
+  <g stroke="#fffdf8" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M97 74 C 88 56 76 40 61 28"/>
+    <path d="M132 73 C 140 52 154 36 172 26"/>
+    <circle cx="59" cy="26" r="7"/>
+    <circle cx="174" cy="24" r="7"/>
+    <path d="M86 199 L 80 218"/>
+    <path d="M154 199 L 160 218"/>
+    <path d="M46 94 C 44 79 54 72 68 73 C 110 70 152 71 176 73 C 191 72 199 81 198 95 C 201 124 201 156 197 176 C 199 190 189 198 175 197 C 130 200 92 199 64 197 C 50 199 41 190 43 176 C 40 148 41 118 46 94 Z" fill="#fffdf8"/>
+  </g>
   <g stroke="#141414" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
     <path d="M97 74 C 88 56 76 40 61 28" fill="none"/>
     <path d="M132 73 C 140 52 154 36 172 26" fill="none"/>
