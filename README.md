@@ -5,7 +5,6 @@
 # Netflix Watch History
 
 [![Release](https://github.com/rocktimsaikia/netflix-watch-history/actions/workflows/release.yml/badge.svg)](https://github.com/rocktimsaikia/netflix-watch-history/actions/workflows/release.yml)
-[![Chrome Web Store](https://img.shields.io/chrome-web-store/v/gmdgnkllicjpablnahoijlkojeecapho?label=chrome%20web%20store&color=e50914)](https://chromewebstore.google.com/detail/watch-history-for-netflix/gmdgnkllicjpablnahoijlkojeecapho)
 
 Chrome extension that adds a **History** button to the Netflix navbar, taking you straight to the hidden viewing activity page.
 
