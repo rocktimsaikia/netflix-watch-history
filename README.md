@@ -8,6 +8,8 @@
 
 Adds a **History** button to the Netflix navbar. Thumbnails and IMDb links included.
 
+![History button in the Netflix navbar](assets/navbar-history-button.png)
+
 ## Install
 
 [link-chrome]: https://chromewebstore.google.com/detail/watch-history-for-netflix/gmdgnkllicjpablnahoijlkojeecapho 'Version published on Chrome Web Store'
