@@ -11,8 +11,11 @@ Chrome extension that adds a **History** button to the Netflix navbar, taking yo
 ## Install
 
 [link-chrome]: https://chromewebstore.google.com/detail/watch-history-for-netflix/gmdgnkllicjpablnahoijlkojeecapho 'Version published on Chrome Web Store'
+[link-firefox]: https://addons.mozilla.org/firefox/addon/watch-history-for-netflix/ 'Version published on Mozilla Add-ons'
 
 [<img src="https://raw.githubusercontent.com/alrra/browser-logos/90fdf03c/src/chrome/chrome.svg" width="48" alt="Chrome" valign="middle">][link-chrome] [<img valign="middle" src="https://img.shields.io/chrome-web-store/v/gmdgnkllicjpablnahoijlkojeecapho.svg?label=%20">][link-chrome] and other Chromium browsers
+
+[<img src="https://raw.githubusercontent.com/alrra/browser-logos/90fdf03c/src/firefox/firefox.svg" width="48" alt="Firefox" valign="middle">][link-firefox] [<img valign="middle" src="https://img.shields.io/amo/v/watch-history-for-netflix.svg?label=%20">][link-firefox] including Firefox Android
 
 ## Features
 
