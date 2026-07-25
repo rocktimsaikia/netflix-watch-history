@@ -14,9 +14,9 @@ function inject() {
   // ponytail: /viewingactivity resolves to the active profile's history page
   a.setAttribute("href", "/viewingactivity");
   a.removeAttribute("aria-current");
-  // Monochrome SVG clock (emoji renders as a vivid glyph); follows text color.
+  // Monochrome SVG history icon (clock with rewind arrow); follows text color.
   const CLOCK_SVG =
-    '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:-1.5px;margin-right:5px"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+    '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1.5px;margin-right:5px"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>';
   clone
     .querySelectorAll('[data-uia="navigation-item-text"], span')
     .forEach((s) => (s.innerHTML = CLOCK_SVG + "History"));
@@ -25,14 +25,18 @@ function inject() {
     color: "#fff",
     background: "#e50914",
     borderRadius: "999px",
-    padding: "4px 12px",
+    padding: "6px 12px",
     fontWeight: "700",
+    // Transparent at rest so the hover border doesn't shift layout.
+    border: "1px solid transparent",
   });
   a.addEventListener("mouseenter", () => {
     a.style.background = "#b0060f";
+    a.style.borderColor = "#ff2c35";
   });
   a.addEventListener("mouseleave", () => {
     a.style.background = "#e50914";
+    a.style.borderColor = "transparent";
   });
   // Netflix's SPA router ignores cloned React handlers; force a real navigation.
   a.addEventListener("click", (e) => {
