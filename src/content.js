@@ -158,9 +158,11 @@ function addThumbs() {
 }
 
 // Netflix is an SPA; navbar mounts/remounts and "Show More" adds rows.
+// Runs at document_start (body doesn't exist yet), so the observer sits on
+// documentElement and injects the same frame the navbar mounts — no late pop-in.
 new MutationObserver(() => {
   inject();
   addThumbs();
-}).observe(document.body, { childList: true, subtree: true });
+}).observe(document.documentElement, { childList: true, subtree: true });
 inject();
 addThumbs();
