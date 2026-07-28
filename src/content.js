@@ -83,6 +83,15 @@ function injectPrime() {
     .querySelectorAll("span")
     .forEach((s) => (s.innerHTML = CLOCK_SVG + "History"));
   stylePill(link, "#00a8e1", "#0089b8", "#4fd0ff");
+  // Prime's nav links are fixed-height boxes with no vertical padding; the
+  // other tabs are transparent so it never shows. A filled pill exposes the
+  // full height, so let ours size to its own text instead. The parent li
+  // centers it. Its hover rule also adds a white glow that fights the blue.
+  Object.assign(link.style, {
+    height: "auto",
+    maxHeight: "none",
+    boxShadow: "none",
+  });
   forceNavigate(link, "https://www.primevideo.com/settings/watch-history");
   nav.appendChild(clone);
 }
