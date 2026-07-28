@@ -1,7 +1,41 @@
 const BTN_ID = "nwh-history-btn";
 
-function inject() {
-  if (document.getElementById(BTN_ID)) return;
+// Monochrome SVG history icon (clock with rewind arrow); follows text color.
+const CLOCK_SVG =
+  '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1.5px;margin-right:5px"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>';
+
+// Distinct filled pill so it stands out from the stock nav tabs.
+function stylePill(a, base, hover, hoverBorder) {
+  Object.assign(a.style, {
+    color: "#fff",
+    background: base,
+    borderRadius: "999px",
+    padding: "6px 12px",
+    fontWeight: "700",
+    // Transparent at rest so the hover border doesn't shift layout.
+    border: "1px solid transparent",
+  });
+  a.addEventListener("mouseenter", () => {
+    a.style.background = hover;
+    a.style.borderColor = hoverBorder;
+  });
+  a.addEventListener("mouseleave", () => {
+    a.style.background = base;
+    a.style.borderColor = "transparent";
+  });
+}
+
+// Both sites are SPAs whose routers ignore cloned React handlers; force a real
+// navigation instead of letting the click fall through to a dead listener.
+function forceNavigate(a, url) {
+  a.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    window.location.assign(url);
+  });
+}
+
+function injectNetflix() {
   const myList = document.querySelector('a[data-uia="nav-myList"]');
   if (!myList) return;
 
@@ -14,38 +48,49 @@ function inject() {
   // ponytail: /viewingactivity resolves to the active profile's history page
   a.setAttribute("href", "/viewingactivity");
   a.removeAttribute("aria-current");
-  // Monochrome SVG history icon (clock with rewind arrow); follows text color.
-  const CLOCK_SVG =
-    '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1.5px;margin-right:5px"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>';
   clone
     .querySelectorAll('[data-uia="navigation-item-text"], span')
     .forEach((s) => (s.innerHTML = CLOCK_SVG + "History"));
-  // Distinct filled pill so it stands out from the stock nav tabs.
-  Object.assign(a.style, {
-    color: "#fff",
-    background: "#e50914",
-    borderRadius: "999px",
-    padding: "6px 12px",
-    fontWeight: "700",
-    // Transparent at rest so the hover border doesn't shift layout.
-    border: "1px solid transparent",
-  });
-  a.addEventListener("mouseenter", () => {
-    a.style.background = "#b0060f";
-    a.style.borderColor = "#ff2c35";
-  });
-  a.addEventListener("mouseleave", () => {
-    a.style.background = "#e50914";
-    a.style.borderColor = "transparent";
-  });
-  // Netflix's SPA router ignores cloned React handlers; force a real navigation.
-  a.addEventListener("click", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    window.location.assign("https://www.netflix.com/viewingactivity");
-  });
+  stylePill(a, "#e50914", "#b0060f", "#ff2c35");
+  forceNavigate(a, "https://www.netflix.com/viewingactivity");
   // Keep it as the last item in the navbar.
   (li.parentElement || li.closest("ul")).appendChild(clone);
+}
+
+function injectPrime() {
+  // Prime's class names are build-hashed; data-testid is the stable hook.
+  const nav = document.querySelector('[data-testid="pv-nav-static-nav"]');
+  const li = nav && nav.lastElementChild;
+  const a = li && li.querySelector("a");
+  if (!a) return;
+
+  const clone = li.cloneNode(true);
+  const link = clone.querySelector("a");
+  link.id = BTN_ID;
+  link.setAttribute("data-testid", "pv-nav-watch-history");
+  link.setAttribute("aria-label", "History");
+  link.setAttribute("href", "/settings/watch-history");
+  link.removeAttribute("aria-current");
+  // The cloned item carries an active-tab class when the user is on its page.
+  // Keep only classes every nav link shares, so no hashed name is hardcoded.
+  const sets = [...nav.querySelectorAll("a")].map((x) => new Set(x.classList));
+  link.className = [...link.classList]
+    .filter((c) => sets.every((s) => s.has(c)))
+    .join(" ");
+  // Each li carries its position for the nav's staggered reveal animation.
+  clone.style.setProperty("--nav-list-child-index", nav.children.length);
+  clone
+    .querySelectorAll("span")
+    .forEach((s) => (s.innerHTML = CLOCK_SVG + "History"));
+  stylePill(link, "#00a8e1", "#0089b8", "#4fd0ff");
+  forceNavigate(link, "https://www.primevideo.com/settings/watch-history");
+  nav.appendChild(clone);
+}
+
+function inject() {
+  if (document.getElementById(BTN_ID)) return;
+  if (location.hostname.endsWith("netflix.com")) injectNetflix();
+  else injectPrime();
 }
 
 // ---- Viewing-activity thumbnails ----
