@@ -79,6 +79,9 @@ function injectPrime() {
     .join(" ");
   // Each li carries its position for the nav's staggered reveal animation.
   clone.style.setProperty("--nav-list-child-index", nav.children.length);
+  // The channels divider butts right up against the pill otherwise; the stock
+  // tabs get their spacing from link padding we've overridden.
+  clone.style.marginRight = "10px";
   clone
     .querySelectorAll("span")
     .forEach((s) => (s.innerHTML = CLOCK_SVG + "History"));
