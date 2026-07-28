@@ -105,18 +105,31 @@ function inject() {
   else injectPrime();
 }
 
-// ---- Viewing-activity thumbnails ----
+// ---- Watch-history page decorations ----
 
 const THUMB_CACHE_PREFIX = "nwh-thumb-";
 let thumbQueue = [];
 let thumbActive = 0;
 
-function addThumbStyles() {
+// ponytail: search link, not direct title page — no free Netflix-to-IMDb
+// ID mapping; series episode rows search by show name alone
+function imdbBadge(query) {
+  const a = document.createElement("a");
+  a.className = "nwh-imdb";
+  a.textContent = "IMDb";
+  a.target = "_blank";
+  a.rel = "noopener";
+  a.href = `https://www.imdb.com/find/?s=tt&q=${encodeURIComponent(query)}`;
+  return a;
+}
+
+function addStyles() {
   if (document.getElementById("nwh-style")) return;
   const st = document.createElement("style");
   st.id = "nwh-style";
-  // The activity table uses table-cell columns; flex keeps them aligned
-  // once a 54px-tall thumbnail lands in the title column.
+  // The Netflix activity table uses table-cell columns; flex keeps them
+  // aligned once a 54px-tall thumbnail lands in the title column. Those rules
+  // match nothing on Prime, which only needs the badge styling.
   st.textContent = `
 li.retableRow { display: flex !important; align-items: center; }
 li.retableRow .col { border-top: 0 !important; }
@@ -189,7 +202,7 @@ function pumpThumbs() {
 
 function addThumbs() {
   if (!location.pathname.startsWith("/viewingactivity")) return;
-  addThumbStyles();
+  addStyles();
   document.querySelectorAll("li.retableRow").forEach((row) => {
     if (row.querySelector(".nwh-thumb")) return;
     const link = row.querySelector('.col.title a[href^="/title/"]');
@@ -199,27 +212,43 @@ function addThumbs() {
     img.className = "nwh-thumb";
     const titleCol = link.closest(".col.title") || link.parentElement;
     titleCol.prepend(img);
-    const imdb = document.createElement("a");
-    imdb.className = "nwh-imdb";
-    imdb.textContent = "IMDb";
-    imdb.target = "_blank";
-    imdb.rel = "noopener";
-    // ponytail: search link, not direct title page — no free Netflix-to-IMDb
-    // ID mapping; series episode rows search by show name alone
-    const query = link.textContent.split(":")[0].trim();
-    imdb.href = `https://www.imdb.com/find/?s=tt&q=${encodeURIComponent(query)}`;
-    titleCol.appendChild(imdb);
+    titleCol.appendChild(imdbBadge(link.textContent.split(":")[0].trim()));
     thumbQueue.push({ id, img });
   });
   pumpThumbs();
 }
 
-// Netflix is an SPA; navbar mounts/remounts and "Show More" adds rows.
+// Prime already ships artwork on its history page, so only the badge is added.
+function addPrimeImdb() {
+  if (!location.pathname.startsWith("/settings/watch-history")) return;
+  addStyles();
+  document
+    .querySelectorAll('[data-testid="activity-history-item"]')
+    .forEach((row) => {
+      if (row.querySelector(".nwh-imdb")) return;
+      // Each row has two /detail/ links: the thumbnail and the title. Only the
+      // title one carries text, and series keep their episodes in a dropdown
+      // so the text is already the bare show name.
+      const link = [...row.querySelectorAll('a[href*="/detail/"]')].find((a) =>
+        a.textContent.trim()
+      );
+      if (!link) return;
+      const badge = imdbBadge(link.textContent.trim());
+      badge.style.marginLeft = "8px";
+      link.after(badge);
+    });
+}
+
+// Both sites are SPAs; navbars mount/remount and "Show more" adds rows.
 // Runs at document_start (body doesn't exist yet), so the observer sits on
 // documentElement and injects the same frame the navbar mounts — no late pop-in.
-new MutationObserver(() => {
+function decorate() {
   inject();
   addThumbs();
-}).observe(document.documentElement, { childList: true, subtree: true });
-inject();
-addThumbs();
+  addPrimeImdb();
+}
+new MutationObserver(decorate).observe(document.documentElement, {
+  childList: true,
+  subtree: true,
+});
+decorate();
