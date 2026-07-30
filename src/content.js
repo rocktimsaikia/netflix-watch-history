@@ -1,7 +1,41 @@
 const BTN_ID = "nwh-history-btn";
 
-function inject() {
-  if (document.getElementById(BTN_ID)) return;
+// Monochrome SVG history icon (clock with rewind arrow); follows text color.
+const CLOCK_SVG =
+  '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1.5px;margin-right:5px"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>';
+
+// Distinct filled pill so it stands out from the stock nav tabs.
+function stylePill(a, base, hover, hoverBorder) {
+  Object.assign(a.style, {
+    color: "#fff",
+    background: base,
+    borderRadius: "999px",
+    padding: "6px 12px",
+    fontWeight: "700",
+    // Transparent at rest so the hover border doesn't shift layout.
+    border: "1px solid transparent",
+  });
+  a.addEventListener("mouseenter", () => {
+    a.style.background = hover;
+    a.style.borderColor = hoverBorder;
+  });
+  a.addEventListener("mouseleave", () => {
+    a.style.background = base;
+    a.style.borderColor = "transparent";
+  });
+}
+
+// Both sites are SPAs whose routers ignore cloned React handlers; force a real
+// navigation instead of letting the click fall through to a dead listener.
+function forceNavigate(a, url) {
+  a.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    window.location.assign(url);
+  });
+}
+
+function injectNetflix() {
   const myList = document.querySelector('a[data-uia="nav-myList"]');
   if (!myList) return;
 
@@ -14,52 +48,88 @@ function inject() {
   // ponytail: /viewingactivity resolves to the active profile's history page
   a.setAttribute("href", "/viewingactivity");
   a.removeAttribute("aria-current");
-  // Monochrome SVG history icon (clock with rewind arrow); follows text color.
-  const CLOCK_SVG =
-    '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1.5px;margin-right:5px"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>';
   clone
     .querySelectorAll('[data-uia="navigation-item-text"], span')
     .forEach((s) => (s.innerHTML = CLOCK_SVG + "History"));
-  // Distinct filled pill so it stands out from the stock nav tabs.
-  Object.assign(a.style, {
-    color: "#fff",
-    background: "#e50914",
-    borderRadius: "999px",
-    padding: "6px 12px",
-    fontWeight: "700",
-    // Transparent at rest so the hover border doesn't shift layout.
-    border: "1px solid transparent",
-  });
-  a.addEventListener("mouseenter", () => {
-    a.style.background = "#b0060f";
-    a.style.borderColor = "#ff2c35";
-  });
-  a.addEventListener("mouseleave", () => {
-    a.style.background = "#e50914";
-    a.style.borderColor = "transparent";
-  });
-  // Netflix's SPA router ignores cloned React handlers; force a real navigation.
-  a.addEventListener("click", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    window.location.assign("https://www.netflix.com/viewingactivity");
-  });
+  stylePill(a, "#e50914", "#b0060f", "#ff2c35");
+  forceNavigate(a, "https://www.netflix.com/viewingactivity");
   // Keep it as the last item in the navbar.
   (li.parentElement || li.closest("ul")).appendChild(clone);
 }
 
-// ---- Viewing-activity thumbnails ----
+function injectPrime() {
+  // Prime's class names are build-hashed; data-testid is the stable hook.
+  const nav = document.querySelector('[data-testid="pv-nav-static-nav"]');
+  const li = nav && nav.lastElementChild;
+  const a = li && li.querySelector("a");
+  if (!a) return;
+
+  const clone = li.cloneNode(true);
+  const link = clone.querySelector("a");
+  link.id = BTN_ID;
+  link.setAttribute("data-testid", "pv-nav-watch-history");
+  link.setAttribute("aria-label", "History");
+  link.setAttribute("href", "/settings/watch-history");
+  link.removeAttribute("aria-current");
+  // The cloned item carries an active-tab class when the user is on its page.
+  // Keep only classes every nav link shares, so no hashed name is hardcoded.
+  const sets = [...nav.querySelectorAll("a")].map((x) => new Set(x.classList));
+  link.className = [...link.classList]
+    .filter((c) => sets.every((s) => s.has(c)))
+    .join(" ");
+  // Each li carries its position for the nav's staggered reveal animation.
+  clone.style.setProperty("--nav-list-child-index", nav.children.length);
+  // The channels divider butts right up against the pill otherwise; the stock
+  // tabs get their spacing from link padding we've overridden.
+  clone.style.marginRight = "10px";
+  clone
+    .querySelectorAll("span")
+    .forEach((s) => (s.innerHTML = CLOCK_SVG + "History"));
+  stylePill(link, "#00a8e1", "#0089b8", "#4fd0ff");
+  // Prime's nav links are fixed-height boxes with no vertical padding; the
+  // other tabs are transparent so it never shows. A filled pill exposes the
+  // full height, so let ours size to its own text instead. The parent li
+  // centers it. Its hover rule also adds a white glow that fights the blue.
+  Object.assign(link.style, {
+    height: "auto",
+    maxHeight: "none",
+    boxShadow: "none",
+  });
+  forceNavigate(link, "https://www.primevideo.com/settings/watch-history");
+  nav.appendChild(clone);
+}
+
+function inject() {
+  if (document.getElementById(BTN_ID)) return;
+  if (location.hostname.endsWith("netflix.com")) injectNetflix();
+  else injectPrime();
+}
+
+// ---- Watch-history page decorations ----
 
 const THUMB_CACHE_PREFIX = "nwh-thumb-";
 let thumbQueue = [];
 let thumbActive = 0;
 
-function addThumbStyles() {
+// ponytail: search link, not direct title page — no free Netflix-to-IMDb
+// ID mapping; series episode rows search by show name alone
+function imdbBadge(query) {
+  const a = document.createElement("a");
+  a.className = "nwh-imdb";
+  a.textContent = "IMDb";
+  a.target = "_blank";
+  a.rel = "noopener";
+  a.href = `https://www.imdb.com/find/?s=tt&q=${encodeURIComponent(query)}`;
+  return a;
+}
+
+function addStyles() {
   if (document.getElementById("nwh-style")) return;
   const st = document.createElement("style");
   st.id = "nwh-style";
-  // The activity table uses table-cell columns; flex keeps them aligned
-  // once a 54px-tall thumbnail lands in the title column.
+  // The Netflix activity table uses table-cell columns; flex keeps them
+  // aligned once a 54px-tall thumbnail lands in the title column. Those rules
+  // match nothing on Prime, which only needs the badge styling.
   st.textContent = `
 li.retableRow { display: flex !important; align-items: center; }
 li.retableRow .col { border-top: 0 !important; }
@@ -132,7 +202,7 @@ function pumpThumbs() {
 
 function addThumbs() {
   if (!location.pathname.startsWith("/viewingactivity")) return;
-  addThumbStyles();
+  addStyles();
   document.querySelectorAll("li.retableRow").forEach((row) => {
     if (row.querySelector(".nwh-thumb")) return;
     const link = row.querySelector('.col.title a[href^="/title/"]');
@@ -142,27 +212,43 @@ function addThumbs() {
     img.className = "nwh-thumb";
     const titleCol = link.closest(".col.title") || link.parentElement;
     titleCol.prepend(img);
-    const imdb = document.createElement("a");
-    imdb.className = "nwh-imdb";
-    imdb.textContent = "IMDb";
-    imdb.target = "_blank";
-    imdb.rel = "noopener";
-    // ponytail: search link, not direct title page — no free Netflix-to-IMDb
-    // ID mapping; series episode rows search by show name alone
-    const query = link.textContent.split(":")[0].trim();
-    imdb.href = `https://www.imdb.com/find/?s=tt&q=${encodeURIComponent(query)}`;
-    titleCol.appendChild(imdb);
+    titleCol.appendChild(imdbBadge(link.textContent.split(":")[0].trim()));
     thumbQueue.push({ id, img });
   });
   pumpThumbs();
 }
 
-// Netflix is an SPA; navbar mounts/remounts and "Show More" adds rows.
+// Prime already ships artwork on its history page, so only the badge is added.
+function addPrimeImdb() {
+  if (!location.pathname.startsWith("/settings/watch-history")) return;
+  addStyles();
+  document
+    .querySelectorAll('[data-testid="activity-history-item"]')
+    .forEach((row) => {
+      if (row.querySelector(".nwh-imdb")) return;
+      // Each row has two /detail/ links: the thumbnail and the title. Only the
+      // title one carries text, and series keep their episodes in a dropdown
+      // so the text is already the bare show name.
+      const link = [...row.querySelectorAll('a[href*="/detail/"]')].find((a) =>
+        a.textContent.trim()
+      );
+      if (!link) return;
+      const badge = imdbBadge(link.textContent.trim());
+      badge.style.marginLeft = "8px";
+      link.after(badge);
+    });
+}
+
+// Both sites are SPAs; navbars mount/remount and "Show more" adds rows.
 // Runs at document_start (body doesn't exist yet), so the observer sits on
 // documentElement and injects the same frame the navbar mounts — no late pop-in.
-new MutationObserver(() => {
+function decorate() {
   inject();
   addThumbs();
-}).observe(document.documentElement, { childList: true, subtree: true });
-inject();
-addThumbs();
+  addPrimeImdb();
+}
+new MutationObserver(decorate).observe(document.documentElement, {
+  childList: true,
+  subtree: true,
+});
+decorate();

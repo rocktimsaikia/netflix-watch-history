@@ -20,7 +20,10 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://www.netflix.com/*"],
+      "matches": [
+        "https://www.netflix.com/*",
+        "https://www.primevideo.com/*"
+      ],
       "js": ["content.js"],
       "run_at": "document_start"
     }
