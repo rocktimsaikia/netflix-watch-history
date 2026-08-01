@@ -124,7 +124,9 @@ function imdbBadge(query) {
 }
 
 function addStyles() {
-  if (document.getElementById("nwh-style")) return;
+  // At document_start there is no <head> yet; the observer calls back the
+  // moment it exists, so skipping this pass costs nothing.
+  if (!document.head || document.getElementById("nwh-style")) return;
   const st = document.createElement("style");
   st.id = "nwh-style";
   // The Netflix activity table uses table-cell columns; flex keeps them
