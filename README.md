@@ -6,7 +6,7 @@
 
 [![Release](https://github.com/rocktimsaikia/netflix-watch-history/actions/workflows/release.yml/badge.svg)](https://github.com/rocktimsaikia/netflix-watch-history/actions/workflows/release.yml)
 
-Adds a **History** button to the Netflix and Prime Video navbars. Thumbnails and IMDb links included.
+Adds the missing **History** button to Netflix and Prime Video navbars. Thumbnails and IMDb links included.
 
 ![Clicking the History button, then the viewing activity page with thumbnails and IMDb links](assets/demo.gif)
 
