@@ -6,11 +6,9 @@
 
 [![Release](https://github.com/rocktimsaikia/netflix-watch-history/actions/workflows/release.yml/badge.svg)](https://github.com/rocktimsaikia/netflix-watch-history/actions/workflows/release.yml)
 
-Adds a **History** button to the Netflix navbar. Thumbnails and IMDb links included.
+Adds a **History** button to the Netflix and Prime Video navbars. Thumbnails and IMDb links included.
 
-![History button in the Netflix navbar](assets/navbar-history-button.png)
-
-![Viewing activity with thumbnails and IMDb links](assets/viewing-activity.png)
+![Clicking the History button, then the viewing activity page with thumbnails and IMDb links](assets/demo.gif)
 
 ## Install
 
@@ -23,12 +21,13 @@ Adds a **History** button to the Netflix navbar. Thumbnails and IMDb links inclu
 
 ## Features
 
-- One-click access to your viewing activity from the navbar
-- Thumbnails for every title in the activity list
-- IMDb search link next to each title
+- One-click access to your viewing activity from the Netflix and Prime Video navbars
+- Thumbnails for every title in the Netflix activity list (Prime Video already ships its own artwork)
+- IMDb search link next to each title on both sites
 - Thumbnail URLs cached locally, so lists load fast after first visit
+- Button matches each site's look: red pill on Netflix, blue on Prime Video
 
 ## Notes
 
-- Works with the active profile (uses `netflix.com/viewingactivity`)
-- No permissions beyond running on `netflix.com`
+- Works with the active profile (`netflix.com/viewingactivity`, `primevideo.com/settings/watch-history`)
+- No permissions beyond running on `netflix.com` and `primevideo.com`
