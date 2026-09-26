@@ -145,7 +145,8 @@ li.retableRow .col.delete { flex-shrink: 0; width: auto; }
 .nwh-imdb { flex-shrink: 0; background: #f5c518; color: #000 !important; font-weight: 700; font-size: 11px; padding: 2px 8px; border-radius: 4px; text-decoration: none; }
 .nwh-imdb:hover { background: #e0b100; }
 `;
-  document.head.appendChild(st);
+  // document_start: <head> may not exist yet on the first decorate() pass.
+  (document.head || document.documentElement).appendChild(st);
 }
 
 async function fetchThumb(id) {
