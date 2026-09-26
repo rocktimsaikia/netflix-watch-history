@@ -36,11 +36,15 @@ function forceNavigate(a, url) {
 }
 
 function injectNetflix() {
-  const myList = document.querySelector('a[data-uia="nav-myList"]');
-  if (!myList) return;
+  // My List moved under "More" in the 2026 navbar; New & Popular is the last
+  // top-level tab now. Older layouts still match nav-myList.
+  const anchor = document.querySelector(
+    'a[data-uia="nav-latest"], a[data-uia="nav-myList"]'
+  );
+  if (!anchor) return;
 
   // Clone an existing nav item so we inherit Netflix's hashed CSS-in-JS styles.
-  const li = myList.closest("li") || myList.parentElement;
+  const li = anchor.closest("li") || anchor.parentElement;
   const clone = li.cloneNode(true);
   const a = clone.querySelector("a");
   a.id = BTN_ID;
